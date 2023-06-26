@@ -1,11 +1,21 @@
 set env vars
 set -o allexport; source .env; set +o allexport;
 
-chmod +x ./docker
-chmod +x ./docker/*.sh
+mkdir -p ./docker
+chown -R 1000:1000 ./docker
 
 mkdir -p ./superset_home
 chown -R 1000:1000 ./superset_home
+
+mkdir -p ./redis
+chown -R 1000:1000 ./redis
+
+mkdir -p ./db_home
+chown -R 1000:1000 ./db_home
+
+chmod +x ./docker
+chmod +x ./docker/*.sh
+
 
 cat << EOF > ./docker/pythonpath_dev/superset_config_docker.py
 SECRET_KEY = '${ADMIN_PASSWORD}'
