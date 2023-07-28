@@ -60,7 +60,8 @@ environments:
     value: "random_password"
   - key: "PREVENT_UNSAFE_DB_CONNECTIONS"
     value: "false"
-
+  - key: "SUPERSET_WEBSERVER_PROTOCOL"
+    value: "https"
 config:
   runTime: "dockerCompose"
   version: ""
