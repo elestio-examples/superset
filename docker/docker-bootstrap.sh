@@ -37,6 +37,41 @@ fi
 
 if [[ "${1}" == "worker" ]]; then
   echo "Starting Celery worker..."
+  
+  # Update package list and install necessary tools
+  apt update && apt install -y wget unzip curl
+
+  # Determine architecture (amd64 or arm64)
+  ARCH=$(dpkg --print-architecture)
+
+  # Download and install Google Chrome based on architecture
+  if [ "$ARCH" = "amd64" ]; then
+      wget -q https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_114.0.5735.90-1_amd64.deb
+      apt-get install -y --no-install-recommends ./google-chrome-stable_114.0.5735.90-1_amd64.deb
+      rm -f google-chrome-stable_114.0.5735.90-1_amd64.deb
+  elif [ "$ARCH" = "arm64" ]; then
+      wget -q https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_114.0.5735.90-1_arm64.deb
+      apt-get install -y --no-install-recommends ./google-chrome-stable_114.0.5735.90-1_arm64.deb
+      rm -f google-chrome-stable_114.0.5735.90-1_arm64.deb
+  else
+      echo "Unsupported architecture: $ARCH"
+      exit 1
+  fi
+
+  # Install Chromedriver based on Chrome version and architecture
+  CHROMEDRIVER_VERSION=$(curl --silent https://chromedriver.storage.googleapis.com/LATEST_RELEASE_114)
+  if [ "$ARCH" = "amd64" ]; then
+      wget -q https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip
+  elif [ "$ARCH" = "arm64" ]; then
+      wget -q https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux_arm64.zip
+  fi
+
+  # Unzip Chromedriver and move it to /usr/bin
+  unzip chromedriver_linux*.zip -d /usr/bin
+  chmod 755 /usr/bin/chromedriver
+  rm -f chromedriver_linux*.zip
+
+  # Start the Celery worker
   celery --app=superset.tasks.celery_app:app worker -O fair -l INFO
 elif [[ "${1}" == "beat" ]]; then
   echo "Starting Celery beat..."
