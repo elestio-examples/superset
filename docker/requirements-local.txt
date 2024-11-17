@@ -1,1 +1,2 @@
 trino
+psycopg2-binary
