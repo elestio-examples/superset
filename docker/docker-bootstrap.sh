@@ -30,6 +30,7 @@ fi
 #
 if [ -f "${REQUIREMENTS_LOCAL}" ]; then
   echo "Installing local overrides at ${REQUIREMENTS_LOCAL}"
+  apt-get update && apt-get install -y gcc g++  make libmariadb-dev-compat libmariadb-dev pkg-config
   pip install -r "${REQUIREMENTS_LOCAL}"
 else
   echo "Skipping local overrides"
